@@ -1,3 +1,6 @@
+
+import javax.swing.JOptionPane;
+
 public class Proveedor {
 
     private int idProveedor;
@@ -59,4 +62,4 @@ public class Proveedor {
 
     public void eliminarProveedor() {
         JOptionPane.showMessageDialog(null, "Proveedor " + this.nombre + " eliminado del sistema.");
-    }
+    }}

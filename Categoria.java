@@ -1,4 +1,6 @@
-  public class Categoria {
+import javax.swing.JOptionPane;
+
+public class Categoria {
 
     private int idCategoria;
     private String nombre;
