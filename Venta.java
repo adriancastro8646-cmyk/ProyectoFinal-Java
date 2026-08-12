@@ -1,68 +1,100 @@
-import javax.swing.JOptionPane;
-
 public class Venta {
- private int idVenta;
- private String fecha;
- private double total;
- private String nombreEmpleado;
+    private int idVenta;
+    private String fecha;
+    private double total;
+    private String nombreEmpleado;
+    private DetalleVenta[] detalles = new DetalleVenta[100];
+    private int cantidadDetalles;
 
     public Venta() {
     }
 
     public Venta(int idVenta, String fecha, double total, String nombreEmpleado) {
-    this.idVenta = idVenta;
-    this.fecha = fecha;
-    this.total = total;
-    this.nombreEmpleado = nombreEmpleado;}
-    
+        this.idVenta = idVenta;
+        this.fecha = fecha;
+
+        if (total < 0) {
+            throw new IllegalArgumentException("El total no puede ser negativo.");
+        }
+
+        this.total = total;
+        this.nombreEmpleado = nombreEmpleado;
+    }
 
     public int getIdVenta() {
-    return idVenta;}
-    
+        return idVenta;
+    }
 
     public void setIdVenta(int idVenta) {
-    this.idVenta = idVenta;}
-    
+        this.idVenta = idVenta;
+    }
 
     public String getFecha() {
-    return fecha;}
-    
+        return fecha;
+    }
 
     public void setFecha(String fecha) {
-    this.fecha = fecha;}
-    
+        this.fecha = fecha;
+    }
+
     public double getTotal() {
-    return total;}
-    
+        return total;
+    }
+
     public void setTotal(double total) {
-    this.total = total;}
-  
+        if (total < 0) {
+            throw new IllegalArgumentException("El total no puede ser negativo.");
+        }
+
+        this.total = total;
+    }
+
     public String getNombreEmpleado() {
-    return nombreEmpleado;}
-    
+        return nombreEmpleado;
+    }
+
     public void setNombreEmpleado(String nombreEmpleado) {
-    this.nombreEmpleado = nombreEmpleado;}
-    
+        this.nombreEmpleado = nombreEmpleado;
+    }
 
-    public void agregarProducto() {
-    String nombreProducto = JOptionPane.showInputDialog("Nombre del producto:");
-    double precioProducto = Double.parseDouble(JOptionPane.showInputDialog("Precio del producto:"));
-    total += precioProducto;
-    JOptionPane.showMessageDialog(null, "Producto " + nombreProducto + " agregado a la venta");}
-    
-    public void calcularTotal() {
-    double impuesto = total * 0.13;
-    double totalConImpuesto = total + impuesto;
-    JOptionPane.showMessageDialog(null, "Subtotal: " + total + "\n"
-    + "Impuesto: " + impuesto + "\n"
-     + "Total: " + totalConImpuesto);}
-    
+    public void agregarProducto(Producto producto, int cantidad) {
+        if (cantidadDetalles == detalles.length) {
+            throw new IllegalStateException("No se pueden agregar más productos a la venta.");
+        }
 
-    public void generarFactura() {
-        JOptionPane.showMessageDialog(null, "Factura \n\n"
-     + "Id Venta: " + idVenta + "\n"
-     + "Fecha: " + fecha + "\n"
-     + "Empleado: " + nombreEmpleado + "\n"
-     + "Total: " + total);}
-   
+        detalles[cantidadDetalles] = new DetalleVenta(producto, cantidad);
+        cantidadDetalles++;
+
+        total = calcularSubtotal();
+    }
+
+    public int getCantidadDetalles() {
+        return cantidadDetalles;
+    }
+
+    public DetalleVenta obtenerDetalle(int posicion) {
+        if (posicion >= 0 && posicion < cantidadDetalles) {
+            return detalles[posicion];
+        }
+
+        return null;
+    }
+
+    public double calcularSubtotal() {
+        double subtotal = 0;
+
+        for (int i = 0; i < cantidadDetalles; i++) {
+            subtotal = subtotal + detalles[i].calcularSubtotal();
+        }
+
+        return subtotal;
+    }
+
+    public double calcularImpuesto() {
+        return calcularSubtotal() * 0.13;
+    }
+
+    public double calcularTotal() {
+        return calcularSubtotal() + calcularImpuesto();
+    }
 }

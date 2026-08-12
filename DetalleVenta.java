@@ -1,9 +1,16 @@
 public class DetalleVenta {
+
     private Producto producto;
     private int cantidad;
 
     public DetalleVenta(Producto producto, int cantidad) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto es obligatorio.");
+        }
         this.producto = producto;
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
+        }
         this.cantidad = cantidad;
     }
 
@@ -12,6 +19,9 @@ public class DetalleVenta {
     }
 
     public void setProducto(Producto producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto es obligatorio.");
+        }
         this.producto = producto;
     }
 
@@ -20,6 +30,13 @@ public class DetalleVenta {
     }
 
     public void setCantidad(int cantidad) {
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
+        }
         this.cantidad = cantidad;
+    }
+
+    public double calcularSubtotal() {
+        return producto.getPrecio() * cantidad;
     }
 }

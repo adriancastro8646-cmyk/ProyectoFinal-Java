@@ -7,6 +7,12 @@ public class Producto {
     public Producto(int codigo, String nombre, double precio, int cantidad) {
         this.codigo = codigo;
         this.nombre = nombre;
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo.");
+        }
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
+        }
         this.precio = precio;
         this.cantidad = cantidad;
     }
@@ -32,6 +38,9 @@ public class Producto {
     }
 
     public void setPrecio(double precio) {
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo.");
+        }
         this.precio = precio;
     }
 
@@ -40,6 +49,9 @@ public class Producto {
     }
 
     public void setCantidad(int cantidad) {
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
+        }
         this.cantidad = cantidad;
     }
 }
