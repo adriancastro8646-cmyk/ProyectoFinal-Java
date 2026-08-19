@@ -1,8 +1,13 @@
+import javax.swing.JOptionPane;
+
 public class Producto {
     private int codigo;
     private String nombre;
     private double precio;
     private int cantidad;
+
+    public Producto() {
+    }
 
     public Producto(int codigo, String nombre, double precio, int cantidad) {
         this.codigo = codigo;
@@ -53,5 +58,29 @@ public class Producto {
             throw new IllegalArgumentException("La cantidad no puede ser negativa.");
         }
         this.cantidad = cantidad;
+    }
+
+    public void registrarProducto() {
+        this.codigo = Integer.parseInt(JOptionPane.showInputDialog("Digite el codigo del producto:"));
+        this.nombre = JOptionPane.showInputDialog("Digite el nombre del producto:");
+        this.precio = Double.parseDouble(JOptionPane.showInputDialog("Digite el precio del producto:"));
+        this.cantidad = Integer.parseInt(JOptionPane.showInputDialog("Digite la cantidad en stock:"));
+    }
+
+    public void actualizarStock(int nuevaCantidad) {
+        this.cantidad = nuevaCantidad;
+    }
+
+    public void cambiarPrecio(double nuevoPrecio) {
+        this.precio = nuevoPrecio;
+    }
+
+    public void consultarProducto() {
+        String datos = "Datos del producto: \n\n" +
+                "Codigo: " + this.codigo + "\n" +
+                "Nombre: " + this.nombre + "\n" +
+                "Precio: " + this.precio + "\n" +
+                "Cantidad en stock: " + this.cantidad;
+        JOptionPane.showMessageDialog(null, datos);
     }
 }

@@ -11,805 +11,705 @@ public class MenusProyecto {
     private static Venta ventaActual;
     private static int siguienteVenta = 1;
 
+    
+    static Inventario inventario = new Inventario(50);
+    static GestionClientes gestionClientes = new GestionClientes(50);
+    static GestionEmpleados gestionEmpleados = new GestionEmpleados(50);
+    static GestionProveedores gestionProveedores = new GestionProveedores(50);
+    static GestionCategorias gestionCategorias = new GestionCategorias(50);
+    static GestionDescuentos gestionDescuentos = new GestionDescuentos(50);
+
+    static Venta ventaActual = null;
+    static int contadorVentas = 1;
+
     public static void main(String[] args) {
-        while (true) {
-            switch (menu("SUPERMERCADO", "Gestión de Productos", "Gestión de Clientes", "Gestión de Empleados",
-                    "Gestión de Ventas", "Gestión de Proveedores", "Gestión de Categorías", "Gestión de Inventario",
-                    "Gestión de Descuentos", "Salir")) {
-                case 0: menuProductos(); break;
-                case 1: menuClientes(); break;
-                case 2: menuEmpleados(); break;
-                case 3: menuVentas(); break;
-                case 4: menuProveedores(); break;
-                case 5: menuCategorias(); break;
-                case 6: menuInventario(); break;
-                case 7: menuDescuentos(); break;
-                default: return;
+        int opcion = 0;
+
+        do {
+
+            String opciones[] = {
+                "Gestión de Productos",
+                "Gestión de Clientes",
+                "Gestión de Empleados",
+                "Gestión de Ventas",
+                "Gestión de Proveedores",
+                "Gestión de Categorías",
+                "Gestión de Inventario",
+                "Gestión de Descuentos",
+                "Salir"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null,
+                    "Seleccione una opción",
+                    "SUPERMERCADO",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    menuProductos();
+                    break;
+                case 1:
+                    menuClientes();
+                    break;
+                case 2:
+                    menuEmpleados();
+                    break;
+                case 3:
+                    menuVentas();
+                    break;
+                case 4:
+                    menuProveedores();
+                    break;
+                case 5:
+                    menuCategorias();
+                    break;
+                case 6:
+                    menuInventario();
+                    break;
+                case 7:
+                    menuDescuentos();
+                    break;
+                case 8:
+                    JOptionPane.showMessageDialog(null, "Saliendo del sistema.");
+                    break;
             }
         }
     }
+
+    // ==================== PRODUCTOS ====================
 
     public static void menuProductos() {
-        while (true) {
-            switch (menu("GESTIÓN DE PRODUCTOS", "Registrar producto", "Actualizar stock", "Cambiar precio", "Consultar producto", "Regresar")) {
-                case 0: registrarProducto(); break;
-                case 1: actualizarStock(); break;
-                case 2: cambiarPrecio(); break;
-                case 3: consultarProductos(); break;
-                default: return;
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar producto",
+                "Actualizar stock",
+                "Cambiar precio",
+                "Consultar producto",
+                "Listar productos",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE PRODUCTOS",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Producto productoNuevo = new Producto();
+                    productoNuevo.registrarProducto();
+                    if (inventario.agregarProducto(productoNuevo)) {
+                        JOptionPane.showMessageDialog(null, "Producto registrado correctamente");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No hay espacio disponible para más productos");
+                    }
+                    break;
+
+                case 1: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        try {
+                            int nuevaCantidad = Integer.parseInt(JOptionPane.showInputDialog("Nueva cantidad en stock:"));
+                            productoEncontrado.actualizarStock(nuevaCantidad);
+                            JOptionPane.showMessageDialog(null, "Stock actualizado correctamente");
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Cantidad inválida");
+                        }
+                    }
+                    break;
+                }
+
+                case 2: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        try {
+                            double nuevoPrecio = Double.parseDouble(JOptionPane.showInputDialog("Nuevo precio:"));
+                            productoEncontrado.cambiarPrecio(nuevoPrecio);
+                            JOptionPane.showMessageDialog(null, "Precio actualizado correctamente");
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Precio inválido");
+                        }
+                    }
+                    break;
+                }
+
+                case 3: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        productoEncontrado.consultarProducto();
+                    }
+                    break;
+                }
+
+                case 4:
+                    listarProductos();
+                    break;
             }
+
+        } while (opcion != 5);
+    }
+
+    private static Producto buscarProductoPorCodigo() {
+        try {
+            int codigoIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el código del producto:"));
+            Producto[] listaProductos = inventario.getProductos();
+            for (int i = 0; i < inventario.getCantidadProductos(); i++) {
+                if (listaProductos[i].getCodigo() == codigoIngresado) {
+                    return listaProductos[i];
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Producto no encontrado");
+            return null;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Código inválido");
+            return null;
         }
     }
+
+    private static void listarProductos() {
+        if (inventario.getCantidadProductos() == 0) {
+            JOptionPane.showMessageDialog(null, "No hay productos registrados");
+            return;
+        }
+        String listaTexto = "Productos registrados: \n\n";
+        Producto[] listaProductos = inventario.getProductos();
+        for (int i = 0; i < inventario.getCantidadProductos(); i++) {
+            listaTexto += listaProductos[i].getCodigo() + " - " + listaProductos[i].getNombre()
+                    + " | Precio: " + listaProductos[i].getPrecio()
+                    + " | Stock: " + listaProductos[i].getCantidad() + "\n";
+        }
+        JOptionPane.showMessageDialog(null, listaTexto);
+    }
+
+    // ==================== CLIENTES ====================
 
     public static void menuClientes() {
-        while (true) {
-            switch (menu("GESTIÓN DE CLIENTES", "Registrar cliente", "Actualizar cliente", "Consultar cliente", "Eliminar cliente", "Regresar")) {
-                case 0: registrarCliente(); break;
-                case 1: actualizarCliente(); break;
-                case 2: consultarCliente(); break;
-                case 3: eliminarCliente(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuEmpleados() {
-        while (true) {
-            switch (menu("GESTIÓN DE EMPLEADOS", "Registrar empleado", "Actualizar empleado", "Consultar empleado", "Eliminar empleado", "Regresar")) {
-                case 0: registrarEmpleado(); break;
-                case 1: actualizarEmpleado(); break;
-                case 2: consultarEmpleado(); break;
-                case 3: eliminarEmpleado(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuVentas() {
-        while (true) {
-            switch (menu("GESTIÓN DE VENTAS", "Nueva venta", "Agregar producto", "Calcular total", "Generar factura", "Regresar")) {
-                case 0: nuevaVenta(); break;
-                case 1: agregarProductoVenta(); break;
-                case 2: mostrarTotalVenta(); break;
-                case 3: generarFactura(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuProveedores() {
-        while (true) {
-            switch (menu("GESTIÓN DE PROVEEDORES", "Registrar proveedor", "Actualizar proveedor", "Consultar proveedor", "Eliminar proveedor", "Regresar")) {
-                case 0: registrarProveedor(); break;
-                case 1: actualizarProveedor(); break;
-                case 2: consultarProveedor(); break;
-                case 3: eliminarProveedor(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuCategorias() {
-        while (true) {
-            switch (menu("GESTIÓN DE CATEGORÍAS", "Registrar categoría", "Actualizar categoría", "Consultar categoría", "Eliminar categoría", "Regresar")) {
-                case 0: registrarCategoria(); break;
-                case 1: actualizarCategoria(); break;
-                case 2: consultarCategoria(); break;
-                case 3: eliminarCategoria(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuInventario() {
-        while (true) {
-            switch (menu("GESTIÓN DE INVENTARIO", "Aumentar stock", "Disminuir stock", "Verificar stock", "Consultar inventario", "Regresar")) {
-                case 0: modificarStock(true); break;
-                case 1: modificarStock(false); break;
-                case 2: verificarStock(); break;
-                case 3: consultarProductos(); break;
-                default: return;
-            }
-        }
-    }
-
-    public static void menuDescuentos() {
-        while (true) {
-            switch (menu("GESTIÓN DE DESCUENTOS", "Registrar descuento", "Actualizar descuento", "Calcular descuento", "Consultar descuento", "Regresar")) {
-                case 0: registrarDescuento(); break;
-                case 1: actualizarDescuento(); break;
-                case 2: calcularDescuento(); break;
-                case 3: consultarDescuento(); break;
-                default: return;
-            }
-        }
-    }
-
-    private static void registrarProducto() {
-        Integer codigo = entero("Código del producto:");
-        if (codigo == null) return;
-
-        String nombre = texto("Nombre del producto:");
-        if (nombre == null) return;
-
-        Double precio = decimalNoNegativo("Precio:");
-        if (precio == null) return;
-
-        Integer cantidad = enteroNoNegativo("Cantidad inicial:");
-        if (cantidad == null) return;
-
-        if (INVENTARIO.agregarProducto(new Producto(codigo, nombre, precio, cantidad))) {
-            mensaje("Producto registrado correctamente.");
-        } else {
-            mensaje("No hay espacio disponible para más productos.");
-        }
-    }
-
-    private static void actualizarStock() {
-        modificarStock(true);
-    }
-
-    private static void modificarStock(boolean aumentar) {
-        Producto producto = seleccionarProducto();
-        if (producto == null) return;
-
-        Integer cambio = enteroNoNegativo("Cantidad a " + (aumentar ? "aumentar:" : "disminuir:"));
-        if (cambio == null) return;
-
-        if (!aumentar && cambio > producto.getCantidad()) {
-            mensaje("No hay suficiente stock.");
-            return;
-        }
-
-        if (aumentar) {
-            producto.setCantidad(producto.getCantidad() + cambio);
-        } else {
-            producto.setCantidad(producto.getCantidad() - cambio);
-        }
-
-        mensaje("Stock actualizado. Existencias: " + producto.getCantidad());
-    }
-
-    private static void cambiarPrecio() {
-        Producto producto = seleccionarProducto();
-        if (producto == null) return;
-
-        Double precio = decimalNoNegativo("Nuevo precio:");
-        if (precio == null) return;
-
-        producto.setPrecio(precio);
-        mensaje("Precio actualizado.");
-    }
-
-    private static void consultarProductos() {
-        if (INVENTARIO.getCantidadProductos() == 0) {
-            mensaje("No hay productos registrados.");
-            return;
-        }
-
-        StringBuilder datos = new StringBuilder("INVENTARIO\n\n");
-
-        for (int i = 0; i < INVENTARIO.getCantidadProductos(); i++) {
-            Producto producto = INVENTARIO.obtenerProducto(i);
-
-            datos.append(producto.getCodigo())
-                    .append(" - ")
-                    .append(producto.getNombre())
-                    .append(" | ₡")
-                    .append(producto.getPrecio())
-                    .append(" | Stock: ")
-                    .append(producto.getCantidad())
-                    .append("\n");
-        }
-
-        mensaje(datos.toString());
-    }
-
-    private static void registrarCliente() {
-        Integer id = entero("ID del cliente:");
-        if (id == null) return;
-
-        String nombre = texto("Nombre:");
-        if (nombre == null) return;
-
-        String telefono = texto("Teléfono:");
-        if (telefono == null) return;
-
-        String correo = texto("Correo:");
-        if (correo == null) return;
-
-        CLIENTES.agregarCliente(new Cliente(id, nombre, telefono, correo));
-    }
-
-    private static void actualizarCliente() {
-        Cliente cliente = seleccionarCliente();
-        if (cliente == null) return;
-
-        int opcion = menu("ACTUALIZAR CLIENTE", "Nombre", "Teléfono", "Correo", "Cancelar");
-
-        if (opcion < 0 || opcion > 2) return;
-
-        String valor = texto("Nuevo valor:");
-        if (valor == null) return;
-
-        if (opcion == 0) {
-            cliente.setNombre(valor);
-        } else if (opcion == 1) {
-            cliente.setTelefono(valor);
-        } else {
-            cliente.setCorreo(valor);
-        }
-
-        mensaje("Cliente actualizado.");
-    }
-
-    private static void consultarCliente() {
-        Cliente cliente = seleccionarCliente();
-
-        if (cliente != null) {
-            mensaje("ID: " + cliente.getIdCliente()
-                    + "\nNombre: " + cliente.getNombre()
-                    + "\nTeléfono: " + cliente.getTelefono()
-                    + "\nCorreo: " + cliente.getCorreo());
-        }
-    }
-
-    private static void eliminarCliente() {
-        int indice = seleccionarClienteIndice();
-
-        if (indice >= 0) {
-            CLIENTES.eliminarCliente(indice);
-        }
-    }
-
-    private static void registrarEmpleado() {
-        Integer id = entero("ID del empleado:");
-        if (id == null) return;
-
-        String nombre = texto("Nombre:");
-        if (nombre == null) return;
-
-        String apellido = texto("Apellido:");
-        if (apellido == null) return;
-
-        String correo = texto("Correo:");
-        if (correo == null) return;
-
-        String telefono = texto("Teléfono:");
-        if (telefono == null) return;
-
-        String cargo = texto("Cargo:");
-        if (cargo == null) return;
-
-        EMPLEADOS.agregarEmpleado(new Empleado(nombre, apellido, id, correo, telefono, cargo));
-    }
-
-    private static void actualizarEmpleado() {
-        Empleado empleado = seleccionarEmpleado();
-        if (empleado == null) return;
-
-        int opcion = menu("ACTUALIZAR EMPLEADO", "Nombre", "Apellido", "Teléfono", "Correo", "Cargo", "Cancelar");
-
-        if (opcion < 0 || opcion > 4) return;
-
-        String valor = texto("Nuevo valor:");
-        if (valor == null) return;
-
-        if (opcion == 0) {
-            empleado.setNombre(valor);
-        } else if (opcion == 1) {
-            empleado.setApellido(valor);
-        } else if (opcion == 2) {
-            empleado.setTelefono(valor);
-        } else if (opcion == 3) {
-            empleado.setCorreo(valor);
-        } else {
-            empleado.setCargo(valor);
-        }
-
-        mensaje("Empleado actualizado.");
-    }
-
-    private static void consultarEmpleado() {
-        Empleado empleado = seleccionarEmpleado();
-
-        if (empleado != null) {
-            mensaje("ID: " + empleado.getIdEmpleado()
-                    + "\nNombre: " + empleado.getNombre() + " " + empleado.getApellido()
-                    + "\nTeléfono: " + empleado.getTelefono()
-                    + "\nCorreo: " + empleado.getCorreo()
-                    + "\nCargo: " + empleado.getCargo());
-        }
-    }
-
-    private static void eliminarEmpleado() {
-        int indice = seleccionarEmpleadoIndice();
-
-        if (indice >= 0) {
-            EMPLEADOS.eliminarEmpleado(indice);
-        }
-    }
-
-    private static void nuevaVenta() {
-        String fecha = texto("Fecha de la venta:");
-        if (fecha == null) return;
-
-        String empleado = texto("Nombre del empleado:");
-        if (empleado == null) return;
-
-        ventaActual = new Venta(siguienteVenta, fecha, 0, empleado);
-        siguienteVenta++;
-
-        mensaje("Venta #" + ventaActual.getIdVenta() + " creada. Ahora agregue productos.");
-    }
-
-    private static void agregarProductoVenta() {
-        if (ventaActual == null) {
-            mensaje("Primero cree una nueva venta.");
-            return;
-        }
-
-        Producto producto = seleccionarProducto();
-        if (producto == null) return;
-
-        Integer cantidad = enteroNoNegativo("Cantidad:");
-        if (cantidad == null || cantidad == 0) return;
-
-        if (cantidad > producto.getCantidad()) {
-            mensaje("No hay suficiente stock.");
-            return;
-        }
-
-        ventaActual.agregarProducto(producto, cantidad);
-        producto.setCantidad(producto.getCantidad() - cantidad);
-
-        mensaje("Producto agregado a la venta.");
-    }
-
-    private static void mostrarTotalVenta() {
-        if (ventaActual == null) {
-            mensaje("No hay una venta activa.");
-            return;
-        }
-
-        mensaje("Subtotal: ₡" + ventaActual.calcularSubtotal()
-                + "\nImpuesto (13%): ₡" + ventaActual.calcularImpuesto()
-                + "\nTotal: ₡" + ventaActual.calcularTotal());
-    }
-
-    private static void generarFactura() {
-        if (ventaActual == null) {
-            mensaje("No hay una venta activa.");
-            return;
-        }
-
-        StringBuilder factura = new StringBuilder();
-
-        factura.append("FACTURA\n\n");
-        factura.append("Venta: ").append(ventaActual.getIdVenta()).append("\n");
-        factura.append("Fecha: ").append(ventaActual.getFecha()).append("\n");
-        factura.append("Empleado: ").append(ventaActual.getNombreEmpleado()).append("\n\n");
-
-        for (int i = 0; i < ventaActual.getCantidadDetalles(); i++) {
-            DetalleVenta detalle = ventaActual.obtenerDetalle(i);
-
-            factura.append(detalle.getProducto().getNombre())
-                    .append(" x")
-                    .append(detalle.getCantidad())
-                    .append(" = ₡")
-                    .append(detalle.calcularSubtotal())
-                    .append("\n");
-        }
-
-        factura.append("\nTotal: ₡").append(ventaActual.calcularTotal());
-
-        mensaje(factura.toString());
-    }
-
-    private static void registrarProveedor() {
-        Integer id = entero("ID del proveedor:");
-        if (id == null) return;
-
-        String nombre = texto("Nombre:");
-        if (nombre == null) return;
-
-        String telefono = texto("Teléfono:");
-        if (telefono == null) return;
-
-        String correo = texto("Correo:");
-        if (correo == null) return;
-
-        String direccion = texto("Dirección:");
-        if (direccion == null) return;
-
-        PROVEEDORES.agregarProveedor(new Proveedor(id, nombre, telefono, correo, direccion));
-    }
-
-    private static void actualizarProveedor() {
-        Proveedor proveedor = seleccionarProveedor();
-        if (proveedor == null) return;
-
-        int opcion = menu("ACTUALIZAR PROVEEDOR", "Nombre", "Teléfono", "Correo", "Dirección", "Cancelar");
-
-        if (opcion < 0 || opcion > 3) return;
-
-        String valor = texto("Nuevo valor:");
-        if (valor == null) return;
-
-        if (opcion == 0) {
-            proveedor.setNombre(valor);
-        } else if (opcion == 1) {
-            proveedor.setTelefono(valor);
-        } else if (opcion == 2) {
-            proveedor.setCorreo(valor);
-        } else {
-            proveedor.setDireccion(valor);
-        }
-
-        mensaje("Proveedor actualizado.");
-    }
-
-    private static void consultarProveedor() {
-        Proveedor proveedor = seleccionarProveedor();
-
-        if (proveedor != null) {
-            mensaje("ID: " + proveedor.getIdProveedor()
-                    + "\nNombre: " + proveedor.getNombre()
-                    + "\nTeléfono: " + proveedor.getTelefono()
-                    + "\nCorreo: " + proveedor.getCorreo()
-                    + "\nDirección: " + proveedor.getDireccion());
-        }
-    }
-
-    private static void eliminarProveedor() {
-        int indice = seleccionarProveedorIndice();
-
-        if (indice >= 0) {
-            PROVEEDORES.eliminarProveedor(indice);
-        }
-    }
-
-    private static void registrarCategoria() {
-        Integer id = entero("ID de la categoría:");
-        if (id == null) return;
-
-        String nombre = texto("Nombre:");
-        if (nombre == null) return;
-
-        String descripcion = texto("Descripción:");
-        if (descripcion == null) return;
-
-        CATEGORIAS.agregarCategoria(new Categoria(id, nombre, descripcion));
-    }
-
-    private static void actualizarCategoria() {
-        Categoria categoria = seleccionarCategoria();
-        if (categoria == null) return;
-
-        String nombre = texto("Nuevo nombre:");
-        if (nombre == null) return;
-
-        String descripcion = texto("Nueva descripción:");
-        if (descripcion == null) return;
-
-        categoria.setNombre(nombre);
-        categoria.setDescripcion(descripcion);
-
-        mensaje("Categoría actualizada.");
-    }
-
-    private static void consultarCategoria() {
-        Categoria categoria = seleccionarCategoria();
-
-        if (categoria != null) {
-            mensaje("ID: " + categoria.getIdCategoria()
-                    + "\nNombre: " + categoria.getNombre()
-                    + "\nDescripción: " + categoria.getDescripcion());
-        }
-    }
-
-    private static void eliminarCategoria() {
-        int indice = seleccionarCategoriaIndice();
-
-        if (indice >= 0) {
-            CATEGORIAS.eliminarCategoria(indice);
-        }
-    }
-
-    private static void verificarStock() {
-        Producto producto = seleccionarProducto();
-
-        if (producto != null) {
-            mensaje(producto.getNombre() + ": "
-                    + producto.getCantidad() + " unidades disponibles.");
-        }
-    }
-
-    private static void registrarDescuento() {
-        if (cantidadDescuentos == DESCUENTOS.length) {
-            mensaje("No hay espacio disponible.");
-            return;
-        }
-
-        Integer id = entero("ID del descuento:");
-        if (id == null) return;
-
-        String nombre = texto("Nombre:");
-        if (nombre == null) return;
-
-        Double porcentaje = porcentaje();
-        if (porcentaje == null) return;
-
-        DESCUENTOS[cantidadDescuentos] = new Descuento(id, nombre, porcentaje);
-        cantidadDescuentos++;
-
-        mensaje("Descuento registrado.");
-    }
-
-    private static void actualizarDescuento() {
-        Descuento descuento = seleccionarDescuento();
-        if (descuento == null) return;
-
-        Double porcentaje = porcentaje();
-
-        if (porcentaje != null) {
-            descuento.setPorcentaje(porcentaje);
-            mensaje("Descuento actualizado.");
-        }
-    }
-
-    private static void calcularDescuento() {
-        Descuento descuento = seleccionarDescuento();
-        if (descuento == null) return;
-
-        Double monto = decimalNoNegativo("Monto a descontar:");
-
-        if (monto != null) {
-            mensaje("Descuento: ₡" + descuento.calcularDescuento(monto)
-                    + "\nTotal con descuento: ₡"
-                    + (monto - descuento.calcularDescuento(monto)));
-        }
-    }
-
-    private static void consultarDescuento() {
-        Descuento descuento = seleccionarDescuento();
-
-        if (descuento != null) {
-            mensaje("ID: " + descuento.getId()
-                    + "\nNombre: " + descuento.getNombre()
-                    + "\nPorcentaje: " + descuento.getPorcentaje() + "%");
-        }
-    }
-
-    private static int menu(String titulo, String... opciones) {
-        return JOptionPane.showOptionDialog(
-                null,
-                "Seleccione una opción",
-                titulo,
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opciones,
-                opciones[0]
-        );
-    }
-
-    private static void mensaje(String texto) {
-        JOptionPane.showMessageDialog(null, texto);
-    }
-
-    private static String texto(String mensaje) {
-        String valor = JOptionPane.showInputDialog(mensaje);
-
-        if (valor == null || valor.trim().isEmpty()) {
-            return null;
-        }
-
-        return valor.trim();
-    }
-
-    private static Integer entero(String mensaje) {
-        while (true) {
-            String valor = texto(mensaje);
-
-            if (valor == null) return null;
-
-            try {
-                return Integer.valueOf(valor);
-            } catch (NumberFormatException e) {
-                mensaje("Ingrese un número entero válido.");
-            }
-        }
-    }
-
-    private static Integer enteroNoNegativo(String mensaje) {
-        while (true) {
-            Integer valor = entero(mensaje);
-
-            if (valor == null || valor >= 0) {
-                return valor;
-            }
-
-            mensaje("El valor no puede ser negativo.");
-        }
-    }
-
-    private static Double decimalNoNegativo(String mensaje) {
-        while (true) {
-            String valor = texto(mensaje);
-
-            if (valor == null) return null;
-
-            try {
-                double numero = Double.parseDouble(valor);
-
-                if (numero >= 0) {
-                    return numero;
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar cliente",
+                "Actualizar cliente",
+                "Consultar cliente",
+                "Eliminar cliente",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE CLIENTES",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Cliente clienteNuevo = new Cliente();
+                    clienteNuevo.registrarCliente();
+                    gestionClientes.agregarCliente(clienteNuevo);
+                    break;
+
+                case 1: {
+                    int posicionCliente = buscarClientePorId();
+                    if (posicionCliente != -1) {
+                        gestionClientes.obtenerCliente(posicionCliente).actualizarCliente();
+                    }
+                    break;
                 }
-            } catch (NumberFormatException e) {
-                mensaje("Ingrese un número válido no negativo.");
+
+                case 2: {
+                    int posicionCliente = buscarClientePorId();
+                    if (posicionCliente != -1) {
+                        gestionClientes.obtenerCliente(posicionCliente).consultarCliente();
+                    }
+                    break;
+                }
+
+                case 3: {
+                    int posicionCliente = buscarClientePorId();
+                    if (posicionCliente != -1) {
+                        gestionClientes.eliminarCliente(posicionCliente);
+                    }
+                    break;
+                }
             }
         }
     }
 
-    private static Double porcentaje() {
-        while (true) {
-            Double valor = decimalNoNegativo("Porcentaje (0 a 100):");
-
-            if (valor == null || valor <= 100) {
-                return valor;
+    private static int buscarClientePorId() {
+        try {
+            int idIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID del cliente:"));
+            Cliente[] listaClientes = gestionClientes.getClientes();
+            for (int i = 0; i < gestionClientes.getCantidadClientes(); i++) {
+                if (listaClientes[i].getIdCliente() == idIngresado) {
+                    return i;
+                }
             }
-
-            mensaje("El porcentaje debe estar entre 0 y 100.");
-        }
-    }
-
-    private static Producto seleccionarProducto() {
-        if (INVENTARIO.getCantidadProductos() == 0) {
-            mensaje("No hay productos registrados.");
-            return null;
-        }
-
-        String[] opciones = new String[INVENTARIO.getCantidadProductos()];
-
-        for (int i = 0; i < opciones.length; i++) {
-            Producto producto = INVENTARIO.obtenerProducto(i);
-            opciones[i] = producto.getCodigo() + " - " + producto.getNombre();
-        }
-
-        int indice = JOptionPane.showOptionDialog(
-                null,
-                "Seleccione un producto",
-                "PRODUCTOS",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opciones,
-                opciones[0]
-        );
-
-        if (indice >= 0) {
-            return INVENTARIO.obtenerProducto(indice);
-        }
-
-        return null;
-    }
-
-    private static Cliente seleccionarCliente() {
-        int indice = seleccionarClienteIndice();
-
-        if (indice >= 0) {
-            return CLIENTES.obtenerCliente(indice);
-        }
-
-        return null;
-    }
-
-    private static int seleccionarClienteIndice() {
-        String[] opciones = new String[CLIENTES.getCantidadClientes()];
-
-        for (int i = 0; i < opciones.length; i++) {
-            Cliente cliente = CLIENTES.obtenerCliente(i);
-            opciones[i] = cliente.getIdCliente() + " - " + cliente.getNombre();
-        }
-
-        return seleccionar("clientes", opciones);
-    }
-
-    private static Empleado seleccionarEmpleado() {
-        int indice = seleccionarEmpleadoIndice();
-
-        if (indice >= 0) {
-            return EMPLEADOS.obtenerEmpleado(indice);
-        }
-
-        return null;
-    }
-
-    private static int seleccionarEmpleadoIndice() {
-        String[] opciones = new String[EMPLEADOS.getCantidadEmpleados()];
-
-        for (int i = 0; i < opciones.length; i++) {
-            Empleado empleado = EMPLEADOS.obtenerEmpleado(i);
-            opciones[i] = empleado.getIdEmpleado() + " - " + empleado.getNombre();
-        }
-
-        return seleccionar("empleados", opciones);
-    }
-
-    private static Proveedor seleccionarProveedor() {
-        int indice = seleccionarProveedorIndice();
-
-        if (indice >= 0) {
-            return PROVEEDORES.obtenerProveedor(indice);
-        }
-
-        return null;
-    }
-
-    private static int seleccionarProveedorIndice() {
-        String[] opciones = new String[PROVEEDORES.getCantidadProveedores()];
-
-        for (int i = 0; i < opciones.length; i++) {
-            Proveedor proveedor = PROVEEDORES.obtenerProveedor(i);
-            opciones[i] = proveedor.getIdProveedor() + " - " + proveedor.getNombre();
-        }
-
-        return seleccionar("proveedores", opciones);
-    }
-
-    private static Categoria seleccionarCategoria() {
-        int indice = seleccionarCategoriaIndice();
-
-        if (indice >= 0) {
-            return CATEGORIAS.obtenerCategoria(indice);
-        }
-
-        return null;
-    }
-
-    private static int seleccionarCategoriaIndice() {
-        String[] opciones = new String[CATEGORIAS.getCantidadCategorias()];
-
-        for (int i = 0; i < opciones.length; i++) {
-            Categoria categoria = CATEGORIAS.obtenerCategoria(i);
-            opciones[i] = categoria.getIdCategoria() + " - " + categoria.getNombre();
-        }
-
-        return seleccionar("categorías", opciones);
-    }
-
-    private static Descuento seleccionarDescuento() {
-        String[] opciones = new String[cantidadDescuentos];
-
-        for (int i = 0; i < opciones.length; i++) {
-            opciones[i] = DESCUENTOS[i].getId() + " - " + DESCUENTOS[i].getNombre();
-        }
-
-        int indice = seleccionar("descuentos", opciones);
-
-        if (indice >= 0) {
-            return DESCUENTOS[indice];
-        }
-
-        return null;
-    }
-
-    private static int seleccionar(String tipo, String[] opciones) {
-        if (opciones.length == 0) {
-            mensaje("No hay " + tipo + " registrados.");
+            JOptionPane.showMessageDialog(null, "Cliente no encontrado");
+            return -1;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido");
             return -1;
         }
+    }
 
-        return JOptionPane.showOptionDialog(
-                null,
-                "Seleccione",
-                tipo.toUpperCase(),
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opciones,
-                opciones[0]
-        );
+    // ==================== EMPLEADOS ====================
+
+    public static void menuEmpleados() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar empleado",
+                "Actualizar empleado",
+                "Consultar empleado",
+                "Eliminar empleado",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE EMPLEADOS",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Empleado empleadoNuevo = new Empleado();
+                    empleadoNuevo.registrarEmpleado();
+                    gestionEmpleados.agregarEmpleado(empleadoNuevo);
+                    break;
+
+                case 1: {
+                    int posicionEmpleado = buscarEmpleadoPorId();
+                    if (posicionEmpleado != -1) {
+                        gestionEmpleados.obtenerEmpleado(posicionEmpleado).actualizarEmpleado();
+                    }
+                    break;
+                }
+
+                case 2: {
+                    int posicionEmpleado = buscarEmpleadoPorId();
+                    if (posicionEmpleado != -1) {
+                        gestionEmpleados.obtenerEmpleado(posicionEmpleado).consultarEmpleado();
+                    }
+                    break;
+                }
+
+                case 3: {
+                    int posicionEmpleado = buscarEmpleadoPorId();
+                    if (posicionEmpleado != -1) {
+                        gestionEmpleados.eliminarEmpleado(posicionEmpleado);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int buscarEmpleadoPorId() {
+        try {
+            int idIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID del empleado:"));
+            Empleado[] listaEmpleados = gestionEmpleados.getEmpleados();
+            for (int i = 0; i < gestionEmpleados.getCantidadEmpleados(); i++) {
+                if (listaEmpleados[i].getIdEmpleado() == idIngresado) {
+                    return i;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Empleado no encontrado");
+            return -1;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido");
+            return -1;
+        }
+    }
+
+    // ==================== VENTAS ====================
+
+    public static void menuVentas() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Agregar producto",
+                "Calcular total",
+                "Generar factura",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE VENTAS",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    agregarProductoAVenta();
+                    break;
+
+                case 1:
+                    if (ventaActual == null) {
+                        JOptionPane.showMessageDialog(null, "No hay una venta en curso. Agregue un producto primero.");
+                    } else {
+                        ventaActual.calcularTotal();
+                    }
+                    break;
+
+                case 2:
+                    if (ventaActual == null) {
+                        JOptionPane.showMessageDialog(null, "No hay una venta en curso. Agregue un producto primero.");
+                    } else {
+                        ventaActual.generarFactura();
+                        ventaActual = null;
+                    }
+                    break;
+            }
+        }
+    }
+
+    private static void agregarProductoAVenta() {
+        if (ventaActual == null) {
+            String fechaVenta = JOptionPane.showInputDialog("Fecha de la venta (dd/mm/aaaa):");
+            String nombreEmpleadoVenta = JOptionPane.showInputDialog("Nombre del empleado que atiende:");
+            ventaActual = new Venta(contadorVentas, fechaVenta, 0, nombreEmpleadoVenta);
+            contadorVentas++;
+        }
+
+        Producto productoEncontrado = buscarProductoPorCodigo();
+        if (productoEncontrado == null) {
+            return;
+        }
+
+        try {
+            int cantidadVendida = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a vender:"));
+            if (cantidadVendida <= 0) {
+                JOptionPane.showMessageDialog(null, "La cantidad debe ser mayor a cero");
+                return;
+            }
+            if (cantidadVendida > productoEncontrado.getCantidad()) {
+                JOptionPane.showMessageDialog(null, "No hay suficiente stock disponible");
+                return;
+            }
+            productoEncontrado.setCantidad(productoEncontrado.getCantidad() - cantidadVendida);
+            ventaActual.agregarProducto(productoEncontrado, cantidadVendida);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Cantidad inválida");
+        }
+    }
+
+    // ==================== PROVEEDORES ====================
+
+    public static void menuProveedores() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar proveedor",
+                "Actualizar proveedor",
+                "Consultar proveedor",
+                "Eliminar proveedor",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE PROVEEDORES",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Proveedor proveedorNuevo = new Proveedor();
+                    proveedorNuevo.registrarProveedor();
+                    gestionProveedores.agregarProveedor(proveedorNuevo);
+                    break;
+
+                case 1: {
+                    int posicionProveedor = buscarProveedorPorId();
+                    if (posicionProveedor != -1) {
+                        gestionProveedores.obtenerProveedor(posicionProveedor).actualizarProveedor();
+                    }
+                    break;
+                }
+
+                case 2: {
+                    int posicionProveedor = buscarProveedorPorId();
+                    if (posicionProveedor != -1) {
+                        gestionProveedores.obtenerProveedor(posicionProveedor).consultarProveedor();
+                    }
+                    break;
+                }
+
+                case 3: {
+                    int posicionProveedor = buscarProveedorPorId();
+                    if (posicionProveedor != -1) {
+                        gestionProveedores.eliminarProveedor(posicionProveedor);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int buscarProveedorPorId() {
+        try {
+            int idIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID del proveedor:"));
+            Proveedor[] listaProveedores = gestionProveedores.getProveedores();
+            for (int i = 0; i < gestionProveedores.getCantidadProveedores(); i++) {
+                if (listaProveedores[i].getIdProveedor() == idIngresado) {
+                    return i;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Proveedor no encontrado");
+            return -1;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido");
+            return -1;
+        }
+    }
+
+    // ==================== CATEGORÍAS ====================
+
+    public static void menuCategorias() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar categoría",
+                "Actualizar categoría",
+                "Consultar categoría",
+                "Eliminar categoría",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE CATEGORÍAS",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Categoria categoriaNueva = new Categoria();
+                    categoriaNueva.registrarCategoria();
+                    gestionCategorias.agregarCategoria(categoriaNueva);
+                    break;
+
+                case 1: {
+                    int posicionCategoria = buscarCategoriaPorId();
+                    if (posicionCategoria != -1) {
+                        gestionCategorias.obtenerCategoria(posicionCategoria).actualizarCategoria();
+                    }
+                    break;
+                }
+
+                case 2: {
+                    int posicionCategoria = buscarCategoriaPorId();
+                    if (posicionCategoria != -1) {
+                        gestionCategorias.obtenerCategoria(posicionCategoria).consultarCategoria();
+                    }
+                    break;
+                }
+
+                case 3: {
+                    int posicionCategoria = buscarCategoriaPorId();
+                    if (posicionCategoria != -1) {
+                        gestionCategorias.eliminarCategoria(posicionCategoria);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int buscarCategoriaPorId() {
+        try {
+            int idIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID de la categoría:"));
+            Categoria[] listaCategorias = gestionCategorias.getCategorias();
+            for (int i = 0; i < gestionCategorias.getCantidadCategorias(); i++) {
+                if (listaCategorias[i].getIdCategoria() == idIngresado) {
+                    return i;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Categoría no encontrada");
+            return -1;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido");
+            return -1;
+        }
+    }
+
+    // ==================== INVENTARIO ====================
+
+    public static void menuInventario() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Aumentar stock",
+                "Disminuir stock",
+                "Verificar stock",
+                "Consultar inventario",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE INVENTARIO",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        try {
+                            int cantidadAumentar = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a aumentar:"));
+                            productoEncontrado.setCantidad(productoEncontrado.getCantidad() + cantidadAumentar);
+                            JOptionPane.showMessageDialog(null, "Stock aumentado correctamente. Stock actual: " + productoEncontrado.getCantidad());
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Cantidad inválida");
+                        }
+                    }
+                    break;
+                }
+
+                case 1: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        try {
+                            int cantidadDisminuir = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a disminuir:"));
+                            if (cantidadDisminuir > productoEncontrado.getCantidad()) {
+                                JOptionPane.showMessageDialog(null, "No hay suficiente stock");
+                            } else {
+                                productoEncontrado.setCantidad(productoEncontrado.getCantidad() - cantidadDisminuir);
+                                JOptionPane.showMessageDialog(null, "Stock disminuido correctamente. Stock actual: " + productoEncontrado.getCantidad());
+                            }
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Cantidad inválida");
+                        }
+                    }
+                    break;
+                }
+
+                case 2: {
+                    Producto productoEncontrado = buscarProductoPorCodigo();
+                    if (productoEncontrado != null) {
+                        try {
+                            int cantidadDeseada = Integer.parseInt(JOptionPane.showInputDialog("Cantidad deseada:"));
+                            if (productoEncontrado.getCantidad() >= cantidadDeseada) {
+                                JOptionPane.showMessageDialog(null, "Hay stock suficiente. Stock actual: " + productoEncontrado.getCantidad());
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Stock insuficiente. Stock actual: " + productoEncontrado.getCantidad());
+                            }
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Cantidad inválida");
+                        }
+                    }
+                    break;
+                }
+
+                case 3:
+                    listarProductos();
+                    break;
+            }
+        }
+    }
+
+    // ==================== DESCUENTOS ====================
+
+    public static void menuDescuentos() {
+        int opcion = 0;
+
+        do {
+            String opciones[] = {
+                "Registrar descuento",
+                "Actualizar descuento",
+                "Calcular descuento",
+                "Consultar descuento",
+                "Eliminar descuento",
+                "Regresar"
+            };
+
+            opcion = JOptionPane.showOptionDialog(
+                    null, "Seleccione una opción", "GESTIÓN DE DESCUENTOS",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    opciones, opciones[0]
+            );
+
+            switch (opcion) {
+                case 0:
+                    Descuento descuentoNuevo = new Descuento();
+                    descuentoNuevo.registrarDescuento();
+                    gestionDescuentos.agregarDescuento(descuentoNuevo);
+                    break;
+
+                case 1: {
+                    int posicionDescuento = buscarDescuentoPorId();
+                    if (posicionDescuento != -1) {
+                        gestionDescuentos.obtenerDescuento(posicionDescuento).actualizarDescuento();
+                    }
+                    break;
+                }
+
+                case 2: {
+                    int posicionDescuento = buscarDescuentoPorId();
+                    if (posicionDescuento != -1) {
+                        try {
+                            double montoIngresado = Double.parseDouble(JOptionPane.showInputDialog("Digite el monto:"));
+                            double valorDescuento = gestionDescuentos.obtenerDescuento(posicionDescuento).calcularDescuento(montoIngresado);
+                            JOptionPane.showMessageDialog(null, "Descuento aplicado: " + valorDescuento
+                                    + "\nTotal a pagar: " + (montoIngresado - valorDescuento));
+                        } catch (NumberFormatException e) {
+                            JOptionPane.showMessageDialog(null, "Monto inválido");
+                        }
+                    }
+                    break;
+                }
+
+                case 3: {
+                    int posicionDescuento = buscarDescuentoPorId();
+                    if (posicionDescuento != -1) {
+                        gestionDescuentos.obtenerDescuento(posicionDescuento).consultarDescuento();
+                    }
+                    break;
+                }
+
+                case 4: {
+                    int posicionDescuento = buscarDescuentoPorId();
+                    if (posicionDescuento != -1) {
+                        gestionDescuentos.eliminarDescuento(posicionDescuento);
+                    }
+                    break;
+                }
+            }
+
+        } while (opcion != 5);
+    }
+
+    private static int buscarDescuentoPorId() {
+        try {
+            int idIngresado = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID del descuento:"));
+            Descuento[] listaDescuentos = gestionDescuentos.getDescuentos();
+            for (int i = 0; i < gestionDescuentos.getCantidadDescuentos(); i++) {
+                if (listaDescuentos[i].getId() == idIngresado) {
+                    return i;
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Descuento no encontrado");
+            return -1;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido");
+            return -1;
+        }
     }
 }

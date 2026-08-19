@@ -10,9 +10,6 @@ public class Descuento {
     public Descuento(int id, String nombre, double porcentaje) {
         this.id = id;
         this.nombre = nombre;
-        if (porcentaje < 0 || porcentaje > 100) {
-            throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100.");
-        }
         this.porcentaje = porcentaje;
     }
 
@@ -37,16 +34,30 @@ public class Descuento {
     }
 
     public void setPorcentaje(double porcentaje) {
-        if (porcentaje < 0 || porcentaje > 100) {
-            throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100.");
-        }
         this.porcentaje = porcentaje;
     }
 
     public double calcularDescuento(double monto) {
-        if (monto < 0) {
-            throw new IllegalArgumentException("El monto no puede ser negativo.");
-        }
-        return monto * porcentaje / 100;
+        double descuento = monto * (porcentaje / 100);
+        return descuento;
+    }
+
+    public void registrarDescuento() {
+        this.id = Integer.parseInt(JOptionPane.showInputDialog("Digite el ID del descuento:"));
+        this.nombre = JOptionPane.showInputDialog("Digite el nombre del descuento:");
+        this.porcentaje = Double.parseDouble(JOptionPane.showInputDialog("Digite el porcentaje del descuento:"));
+    }
+
+    public void actualizarDescuento() {
+        this.nombre = JOptionPane.showInputDialog("Digite el nuevo nombre del descuento:");
+        this.porcentaje = Double.parseDouble(JOptionPane.showInputDialog("Digite el nuevo porcentaje del descuento:"));
+    }
+
+    public void consultarDescuento() {
+        String datos = "Datos del descuento: \n\n" +
+                "ID: " + this.id + "\n" +
+                "Nombre: " + this.nombre + "\n" +
+                "Porcentaje: " + this.porcentaje + "%";
+        JOptionPane.showMessageDialog(null, datos);
     }
 }
