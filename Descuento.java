@@ -1,5 +1,6 @@
-public class Descuento {
+import javax.swing.JOptionPane;
 
+public class Descuento {
     private int id;
     private String nombre;
     private double porcentaje;
